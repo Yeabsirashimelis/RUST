@@ -1,0 +1,85 @@
+IN THIS PROJECT - WE WILL CREATE A WARE-HOUSE INVENTORY MANAGMENT SYSTEM
+
+//PACKAGES AND CRATES
+//it is all about structuring larger projects consisting of multiple files.
+
+/\*
+-a package is a colleciton of one or more crates
+-a crate is a collection of RUST code that produces an excutable or a library
+-a crate is the smallest amount of code that the RUST considers at a time.
+as we can see in the first section of the course, we can run only a single file uisng
+the command "rustc filename.rs". SO this is the smallest amount of code that a RUST compiler considers at a time.
+
+                        TYPES OF CRATES
+
+A BINARY CRATE - is a crate that compiles to an executable
+-a binary crate has a main function that is the entrypoint for the executable
+
+A LIBRARY CRATE - exports functionality for other RUST programs to share and use
+-a library crate does not have a main function and does not compile to be an executable program
+-it is other peoples code you use in your program for a specific functionality
+
+    So, in summary, A Rust project is a folder containing a Cargo.toml file, which defines a package.
+
+A package must include at least one crate, which can be either a binary crate (executable) or a library crate (reusable code).
+
+Cargo.toml file contains metadata and dependencies for the package,
+but the package itself includes the source code inside the src/ directory.
+
+                            A MODULE
+        -is an organizational container that encapsulates related code. which is something which collects similar codes together. it is a FOLDER like in our computer.
+        -here module can be declared in a "separate file" or embedded in codes using "mod" key word
+
+
+                    A CRATE ROOT/ THE MAIN FUNCTION
+        is the base/ foundation of a crate (the starting point for the compiler.)
+
+
+    */
+
+    /*
+
+MODULE AMBIGUITY - is that when we have modules with the same name, they could be in any form. one could be file or the other could be folder type or inline module as well.
+in any form we can't have a module with the same name at the same time
+\*/
+
+AN ABSOLUTE PATH - is the full, complete path to a name starting from the crate root (the main.rs)
+
+A RELATIVE PATH - is the path to a current name starting from the current location/ module.
+
+DEPENDENCY - is an external LIBRARY CRATE that we pull into our project and whose functionalities we will utilize. our code depends on it to run.
+
+THE STANDARD LIBRARY - is a collection of modules built into RUST. the entry point in the standard library is "std".
+
+<!-- the GLOB operator - which is the '*' symbol. --> it is used to import every public name from within a module
+
+we can create a LIBRARY CRATE simply by adding a "lib.rs" file in the src directory
+//////////////////
+
+BIN FOLDER IN THE SRC DIRECTORY - it is used to create a
+
+the bin folder in the src directory is used in Rust projects to organize additional binary crates (executables) separate from the main crate. Typically, the src/main.rs file is used as the main entry point for your application, but if you want to have multiple executables (for example, for different commands or tools within the same project), you can create them in the src/bin/ directory.
+
+Each file inside the src/bin/ folder represents a separate executable, and Rust will treat each of these files as a separate entry point, compiling them into individual binaries.
+
+For example:
+
+graphql
+Copy code
+project_name/
+│
+├── src/
+│ ├── main.rs # The main executable
+│ └── bin/
+│ ├── tool1.rs # A separate binary executable
+│ └── tool2.rs # Another separate binary executable
+src/main.rs is your default binary crate, compiled as the main executable.
+
+src/bin/tool1.rs will be compiled as a separate executable, and you can run it using cargo run --bin tool1.
+
+Similarly, src/bin/tool2.rs will be compiled as another separate executable, and you can run it with cargo run --bin tool2.
+
+This structure helps you manage multiple binaries in a single project without having to split them into entirely different projects.
+
+//////////////////////////////////////
+if you want to have ten different bnary crates that are going to rely on shared constructs like the same strucs, the same enums, the same functions, well the common design practice is to store all of the reusable logic and behaviour and names in your LIBRARY CRATE.

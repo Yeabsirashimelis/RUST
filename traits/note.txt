@@ -1,0 +1,1 @@
+_main.rs and _main2.rs were main.rs before to learn different concepts. so we create another main.rs to explore other trait concepts
