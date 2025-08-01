@@ -1253,6 +1253,7 @@ fn main() {
 //PROJECT
 use std::collections::HashMap;
 use std::env;
+use std::ffi::FromVecWithNulError;
 
 // #![allow(unused, dead_code)]
 #[derive(Debug, PartialEq, Eq, Clone, Hash)]
@@ -1305,18 +1306,18 @@ fn main() {
     println!("******************************************************");
     println!("{:#?}", blender_orders);
 
-    let micro_waves_ordered_quantity = orders
+    let micro_waves_ordered_quantity: u32 = orders
         .iter()
         .filter(|order| order.product == Product::Microwave)
         .map(|order| order.quantity)
-        .fold(0, |accumulator, current| accumulator + current);
+        .sum();
     println!("******************************************************");
     println!("{}", micro_waves_ordered_quantity);
 
     let args = env::args();
     let mut qunatity_from_user = args.skip(1).take(1);
     let quantity = qunatity_from_user.next().unwrap_or_else(|| 2.to_string());
-    let parsed_quantity = quantity.parse::<i32>().unwrap_or_default();
+    let parsed_quantity = quantity.parse::<i32>().unwrap_or(2);
     let orders_dependon_user_input = orders
         .iter()
         .filter(|order| order.quantity as i32 >= parsed_quantity)
@@ -1328,7 +1329,7 @@ fn main() {
     let unshipped_orders_products_quantity = orders
         .iter()
         .filter(|order| !order.shipped)
-        .map(|order: &CustomerOrder| (order.product.clone(), order.quantity))
+        .map(|order| (order.product.clone(), order.quantity))
         .fold(HashMap::new(), |mut acc, (product, quantity)| {
             *acc.entry(product).or_insert(0) += quantity;
             acc
@@ -1336,9 +1337,16 @@ fn main() {
     println!("******************************************************");
     println!("{:#?}", unshipped_orders_products_quantity);
 
-    orders.iter_mut().find(|order| !order.shipped).map(|order| {
-        order.shipped = true;
-    });
+    //find gives us the first occurrence only
+    // orders.iter_mut().find(|order| !order.shipped).map(|order| {
+    //     order.shipped = true;
+    // });
+
+    //or
+    if let Option::Some(order) = orders.iter_mut().find(|order| !order.shipped) {
+        order.shipped = true
+    }
+
     println!("******************************************************");
     println!("{:#?}", orders);
 
@@ -1358,6 +1366,24 @@ fn main() {
             orders: order_refs.into_iter().cloned().collect(),
         })
         .collect();
+
+    //or
+
+    let mut customers_and_their_orders = orders
+        .into_iter()
+        .zip(customer_ids_by_order)
+        .fold(HashMap::new(), |mut ids_to_orders, (order, customer_id)| {
+            let orders = ids_to_orders.entry(customer_id).or_insert(vec![]);
+            orders.push(order);
+            ids_to_orders
+        })
+        .into_iter()
+        .map(|(customer_id, orders)| Customer {
+            id: customer_id,
+            orders,
+        })
+        .collect::<Vec<Customer>>();
+    customers_and_their_orders.sort_by_key(|customer| customer.id);
     println!("******************************************************");
     println!("{:#?}", customers_and_their_orders);
 }
