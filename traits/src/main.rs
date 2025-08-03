@@ -720,7 +720,7 @@ impl Add for Lunch {
     // fn add(self, rhs: Self) -> Self::Output {
     //     self.cost + rhs.cost
     // }
-
+  
     type Output = Lunch; //let's make the addition to return a "Lunch" type
     fn add(self, rhs: Self) -> Self::Output {
         Self {
