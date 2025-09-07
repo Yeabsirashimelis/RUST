@@ -409,7 +409,6 @@ fn main() {
 //                that is why they can be dereferenced to give the values they contain
 //  DEREFMUT TRAIT - enable the pointer to mutate the data, like Box pointers (they implement the trait)
 //DerefMut is a child trait, so to implement it we have to implement the Deref trait first
-use std::ops::{Deref, DerefMut};
 /*
 //to get the idea, let's build a custom smart pointer which contains only one data
 struct CustomBox<T> {
@@ -446,7 +445,7 @@ fn main() {
     println!("{}", *custom_boxy); //now it can be dereferenced
 }
 */
-
+/*
 //and now let's build a custom smart pointer which contains multiple data
 struct CustomBox<T, U> {
     data: T,
@@ -482,4 +481,123 @@ fn main() {
     let mut custom_boxy = CustomBox::new(3.14, String::from("Pi"));
     *custom_boxy = 6.28;
     println!("{}", *custom_boxy); //now it can be dereferenced
+}
+ */
+
+/*
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+//DEREF COERTION
+/*
+when given a reference to a type that implements the Deref trait,
+Rust will convert it into a reference of another type if necessary
+*/
+use std::ops::{Deref, DerefMut};
+
+fn main() {
+    /*
+    //when we pass reference for the string, rust will call the "deref mothod" automatically on the String and change to &str
+    let text = String::from("Hello");
+    output_text(&text); // - &String to &str
+
+    //this is how behind the scene works
+    let text = String::from("Hello");
+    let the_slice = text.deref();
+    output_text(the_slice);
+     */
+
+    //this is the magic of Deref Coercions
+    let text = String::from("Hello");
+    let my_box = Box::new(text);
+    output_text(&my_box); // &Box -> &String -> &str
+
+    //how the code look like if deref coertion was not implemented in RUST
+    let text = String::from("Hello");
+    let my_box = Box::new(text);
+    let value = &(*my_box)[..]; //dereference it, then create a String reference and take the full string as a slice, so you created a &str
+    output_text(value);
+}
+
+fn output_text(text: &str) {
+    println!("{}", text);
+}
+ */
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//TRIAT OBJECTS I
+/*
+A TRAIT OBJECT is an instance of some type that implements a specific trait
+*/
+
+use std::{fmt::format, string};
+
+trait Wearable {
+    fn wear(&self) -> String;
+}
+
+#[derive(Debug)]
+struct Pants {
+    fabric: String,
+    waist_size: u32,
+}
+
+impl Wearable for Pants {
+    fn wear(&self) -> String {
+        format!("{} size {} pants", self.waist_size, self.fabric)
+    }
+}
+
+#[derive(Debug)]
+struct Tie {
+    color: String,
+}
+
+impl Wearable for Tie {
+    fn wear(&self) -> String {
+        format!("{} tie", self.color)
+    }
+}
+fn main() {
+    let pants = Pants {
+        fabric: "Cotton".to_string(),
+        waist_size: 34,
+    };
+
+    let tie = Tie {
+        color: "Red".to_string(),
+    };
+    let pants = Pants {
+        fabric: "Cotton".to_string(),
+        waist_size: 34,
+    };
+
+    let tie = Tie {
+        color: "Red".to_string(),
+    };
+
+    //say that i want to create a collection type, like a vector that is going to package and hold both of these types
+
+    //this won't be possible (is an error), b/c a vector can hold only the same types
+    // let outfit = vec![pants, tie];
+
+    //the BOX smart pointer will enable us to solve the problem.
+    //if we wrap them in a box, and then we are going to add an additional requirement or an additional mandate
+
+    //OH STILL DON'T WORK - b/c rust thinks that we are storing Box pointers which contain pant types
+    // let output = vec![Box::new(pants), Box::new(tie)];
+
+    //ONE MORE THING TO DO
+    //we make the type hold things which implement "Wearable" traits - DYNAMIC TYPE POLYMOPHISM / RUNTIME POLYMORPHISM
+    let outfit: Vec<Box<dyn Wearable>> = vec![Box::new(pants), Box::new(tie)];
+
+    // for item in outfit {
+    //     println!("putting on the {}", item.wear())
+    // }
+
+    let items = outfit
+        .iter()
+        .map(|item| item.wear())
+        .collect::<Vec<String>>();
+
+    println!("{:#?}", items);
 }
